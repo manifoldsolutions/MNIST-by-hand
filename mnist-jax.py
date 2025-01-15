@@ -35,15 +35,15 @@ x_test = x_test/255.0
 # DEFINE THE MODEL (=two matrices with bias)
 var = 0.01
 input_dim = 28*28
-hidden_layer_dim = 100
+hl_dim = 100 # hidden layer dimension
 output_dim = 10
 # initialize input layer:
-W0 = random.normal(key, shape=(input_dim, hidden_layer_dim)) * jn.sqrt(var)
-new_row = random.normal(key, shape=(1, hidden_layer_dim)) * jn.sqrt(var)
+W0 = random.normal(key, shape=(input_dim, hl_dim)) * jn.sqrt(var)
+new_row = random.normal(key, shape=(1, hl_dim)) * jn.sqrt(var)
 # extended matrix to incorporate the bias unit
 W0e = jn.vstack([W0, new_row])
 # initialize output layer
-W1 = random.normal(key, shape=(hidden_layer_dim,output_dim)) * jn.sqrt(var)
+W1 = random.normal(key, shape=(hl_dim,output_dim)) * jn.sqrt(var)
 new_row = random.normal(key, shape=(1, output_dim)) * jn.sqrt(var)
 # extended matrix to incorporate the bias unit
 W1e = jn.vstack([W1, new_row])
@@ -64,19 +64,17 @@ def backprop(I,Do1,o1e,o2,T):
     Ie = jn.hstack([I,jn.ones((batch_size, 1))])
     Dloss = jax.grad(cross_entropy_loss, argnums=0)
     Dl=Dloss(o2,T)
-    o1e=o1e.reshape((bs,101,1))
-    Dl=Dl.reshape((bs,1,10))
+    o1e=o1e.reshape((bs,hl_dim+1,1))
+    Dl=Dl.reshape((bs,1,output_dim))
     Grad_wrt_W1e = (o1e@Dl).mean(axis=0)
-    Dl=Dl.reshape((bs,10,1))
+    Dl=Dl.reshape((bs,output_dim,1))
     D1_=jn.einsum('ij,kjl->kil',W1,Dl)
-    D1=Do1*D1_.reshape((bs,100))
-    Ie=Ie.reshape(bs,785,1)
-    D1=D1.reshape(bs,1,100)
+    D1=Do1*D1_.reshape((bs,hl_dim))
+    Ie=Ie.reshape(bs,input_dim+1,1)
+    D1=D1.reshape(bs,1,hl_dim)
     Grad_wrt_W0e = (Ie@D1).mean(axis=0)
     return Grad_wrt_W0e, Grad_wrt_W1e
 
-# Learning rate
-alpha = 500.0
 for k in range(200):
     perm = jax.random.permutation(key, x_train.shape[0])
     x_train = x_train[perm]
@@ -89,8 +87,9 @@ for k in range(200):
     n_batches = x_train.shape[0] // batch_size
     x_batches = x_train[:n_batches * batch_size].reshape(n_batches, batch_size, -1)
     y_batches = y_train[:n_batches * batch_size].reshape(n_batches, batch_size)
-    # decrease learning rate towards the end:
+    # Learning rate
     alpha = 100_000.0
+    # decrease learning rate towards the end:
     if loss < 1.0: alpha = 10_000
     if loss < 0.5: alpha = 5_000
     if loss < 0.2: alpha = 1_000
