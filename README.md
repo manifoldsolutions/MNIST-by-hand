@@ -1,5 +1,5 @@
 
-## Learning MNIST dataset with 1 hidden layer fully connected network "by hand", 
+## Learning MNIST dataset with 1 hidden layer fully-connected network "by hand", 
 ### that is using only Google JAX's numpy-equivalent for GPU 
 ### acceleration. Forward propagation and backpropagation both          
 ### explicitly calculated in terms of the appropriate matrices.         
