@@ -10,4 +10,6 @@ Without CUDA support, JAX will use CPU, so it will be much slower.
 If you don't have or don't know JAX, you can easily modify the code to be written 
 in numpy (replace "jn" with "np" + debug), but this, again, will slow it down.
 
+The code uses tensorflow.keras to download the mnist dataset. If you don't have that, you can surely download the dataset in many other places.
+
 CC-BY-NC-4.0                                                       
