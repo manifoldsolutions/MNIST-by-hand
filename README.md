@@ -6,7 +6,7 @@
 Only cheating when using JAX to calculate the gradient of cross-entropy.
 
 Usage: You should have JAX+CUDA installed to run this smoothly with Python3. 
-Without cuda support, JAX will use CPU, so it will be much slower.
+Without CUDA support, JAX will use CPU, so it will be much slower.
 If you don't have or don't know JAX, you can easily modify the code to be written 
 in numpy (replace "jn" with "np" + debug), but this, again, will slow it down.
 
